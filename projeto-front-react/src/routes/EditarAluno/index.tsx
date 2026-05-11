@@ -1,17 +1,13 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect} from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import type { TipoAluno } from "../../types/tipoAluno";
 import { useForm } from "react-hook-form";
 
 export default function EditarAluno() {
-  const { id } = useParams<string>();
 
-  const [aluno, setAluno] = useState<TipoAluno>({
-    id: 0,
-    rm: 0,
-    aluno: "",
-    nota: 0,
-  });
+  const navigate = useNavigate();
+
+  const { id } = useParams<string>();
 
   const {
     register,
@@ -43,39 +39,67 @@ export default function EditarAluno() {
     callAluno();
   }, [id,setValue]);
 
+
+  const enviarDados = async  (al : TipoAluno)=>{
+    
+        const response = await fetch(`http://localhost:3000/alunos/${id}`,{
+        method:"PUT",
+        headers:{
+          "Content-Type":"application/json",
+        },
+        body: JSON.stringify(al)
+    });
+
+    try {
+
+        if (response.ok) {
+            navigate("/alunos")
+        } else {
+          throw new Error("Ocorreu um erro ao editar o aluno!");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+
+  }
+
   return (
     <main>
       <h1>Editar Aluno</h1>
       <div>
-        <form className="formAluno">
+        <form className="formAluno" onSubmit={handleSubmit(enviarDados)}>
           <fieldset>
-            <legend>Aluno : {aluno?.id}</legend>
+            <legend>Aluno</legend>
             <div>
               <label htmlFor="rm">RM</label>
               <input
                 type="number"
                 {...register("rm", {
                   valueAsNumber: true,
-                  required: "O RM é obrigatório",
-                  minLength: { value: 6, message: "Mínimo de 6 dígitos" },
-                  maxLength: { value: 7, message: "Máximo de 7 dígitos" },
+                  required: true,
+                  min: { value: 0.01, message: "Mínimo de 6 dígitos" }
                 })}
               />
-              {errors.rm && (
-                <span className="text-red-400">{errors.rm.message}</span>
-              )}
+           <span>
+                { errors.rm &&  <small className="bg-red-400 text-red-600" role="alert">{errors.rm.message}</small>}
+              </span>
             </div>
             <div>
               <label htmlFor="aluno">ALUNO</label>
               <input
                 type="text"
                 {...register("aluno", {
-                  required: true,
+                  required: "Obrigatório o preechimento!",
                   minLength: { value: 3, message: "Mínimo de 3 caractéres" },
-                  maxLength: { value: 7, message: "Máximo de 150 caractéres" },
+                  maxLength: { value: 150, message: "Máximo de 150 caractéres" },
                 })}
               />
+              <span>
+                { errors.aluno &&  <small className="bg-red-400 text-red-600" role="alert">{errors.aluno.message}</small>}
+              </span>
             </div>
+
+
             <div>
               <label htmlFor="nota">NOTA</label>
               <input
@@ -88,6 +112,9 @@ export default function EditarAluno() {
                   max: { value: 10, message: "Valor máximo é 10" },
                 })}
               />
+            </div>
+            <div>
+              <button type="submit">Enviar</button>
             </div>
           </fieldset>
         </form>
