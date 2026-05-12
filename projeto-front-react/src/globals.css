@@ -9,7 +9,7 @@
     }
 }
 
-/* .formAluno{
+.formAluno{
     
     @apply w-[90%] h-[70vh] bg-[#292d2c] text-white mx-auto my-auto;
     
@@ -17,4 +17,4 @@
         @apply block bg-amber-50 mx-auto w-[90%] text-black;
     }
 
-}  */
+} 

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import type { TipoAluno } from "../../types/tipoAluno";
 import { useForm } from "react-hook-form";
@@ -61,6 +61,10 @@ export default function EditarAluno() {
     }
   };
 
+  //Lista de TURMAS
+  const [turmas] = useState<string[]>([
+  "1TDSPB","1TDSPA","1TDSPC","1TDSPD","1TDSPR","1TDSA"]);
+
   return (
     <main>
       <h1>Editar Aluno</h1>
@@ -116,10 +120,10 @@ export default function EditarAluno() {
                 })}
               >
                 <option value="">SELECIONE UMA TURMA</option>
-                <option value="1TDSPB">1TDSPB</option>
-                <option value="1TDSPA">1TDSPA</option>
-                <option value="1TDSPC">1TDSPC</option>
-                <option value="1TDSPD">1TDSPD</option>
+                {turmas.map(t => (
+                  <option key={t}  value={t}>{t}</option>
+                ))}
+                
               </select>
               <span>
                 {errors.turma && (
