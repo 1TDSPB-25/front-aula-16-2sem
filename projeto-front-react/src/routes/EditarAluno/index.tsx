@@ -1,13 +1,12 @@
-import { useEffect} from "react";
+import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import type { TipoAluno } from "../../types/tipoAluno";
 import { useForm } from "react-hook-form";
 
 export default function EditarAluno() {
-
   const navigate = useNavigate();
 
-  const { id } = useParams<string>();
+  const { rm } = useParams<string>();
 
   const {
     register,
@@ -19,14 +18,14 @@ export default function EditarAluno() {
   useEffect(() => {
     const callAluno = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/alunos/${id}`);
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/aluno/${rm}`);
 
         if (response.ok) {
           const data: TipoAluno = await response.json();
 
-          setValue("id", data.id);
-          setValue("rm", data.rm, { shouldValidate: true });
-          setValue("aluno", data.aluno, { shouldValidate: true });
+          setValue("rm", data.rm);
+          setValue("nome", data.nome, { shouldValidate: true });
+          setValue("turma", data.turma, { shouldValidate: true });
           setValue("nota", data.nota, { shouldValidate: true });
         } else {
           throw new Error("Aluno inexistente");
@@ -37,31 +36,30 @@ export default function EditarAluno() {
     };
 
     callAluno();
-  }, [id,setValue]);
+  }, [rm, setValue]);
 
-
-  const enviarDados = async  (al : TipoAluno)=>{
-    
-        const response = await fetch(`http://localhost:3000/alunos/${id}`,{
-        method:"PUT",
-        headers:{
-          "Content-Type":"application/json",
+  const enviarDados = async (al: TipoAluno) => {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/aluno/${rm}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(al)
-    });
+        body: JSON.stringify(al),
+      },
+    );
 
     try {
-
-        if (response.ok) {
-            navigate("/alunos")
-        } else {
-          throw new Error("Ocorreu um erro ao editar o aluno!");
-        }
-      } catch (error) {
-        console.error(error);
+      if (response.ok) {
+        navigate("/alunos");
+      } else {
+        throw new Error("Ocorreu um erro ao editar o aluno!");
       }
-
-  }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <main>
@@ -75,30 +73,62 @@ export default function EditarAluno() {
               <input
                 type="number"
                 {...register("rm", {
-                  valueAsNumber: true,
                   required: true,
-                  min: { value: 0.01, message: "Mínimo de 6 dígitos" }
-                })}
-              />
-           <span>
-                { errors.rm &&  <small className="bg-red-400 text-red-600" role="alert">{errors.rm.message}</small>}
-              </span>
-            </div>
-            <div>
-              <label htmlFor="aluno">ALUNO</label>
-              <input
-                type="text"
-                {...register("aluno", {
-                  required: "Obrigatório o preechimento!",
-                  minLength: { value: 3, message: "Mínimo de 3 caractéres" },
-                  maxLength: { value: 150, message: "Máximo de 150 caractéres" },
+                  minLength: { value: 5, message: "Mínimo de 5 dígitos" },
+                  maxLength: { value: 6, message: "Máximo de 6 dígitos" },
                 })}
               />
               <span>
-                { errors.aluno &&  <small className="bg-red-400 text-red-600" role="alert">{errors.aluno.message}</small>}
+                {errors.rm && (
+                  <small className="bg-red-400 text-red-600" role="alert">
+                    {errors.rm.message}
+                  </small>
+                )}
+              </span>
+            </div>
+            <div>
+              <label htmlFor="nome">NOME</label>
+              <input
+                type="text"
+                {...register("nome", {
+                  required: "Obrigatório o preechimento!",
+                  minLength: { value: 3, message: "Mínimo de 3 caractéres" },
+                  maxLength: {
+                    value: 150,
+                    message: "Máximo de 150 caractéres",
+                  },
+                })}
+              />
+              <span>
+                {errors.nome && (
+                  <small className="bg-red-400 text-red-600" role="alert">
+                    {errors.nome.message}
+                  </small>
+                )}
               </span>
             </div>
 
+            <div>
+              <label htmlFor="turma">TURMA</label>
+              <select
+                {...register("turma", {
+                  required: "Obrigatório o preechimento!",
+                })}
+              >
+                <option value="">SELECIONE UMA TURMA</option>
+                <option value="1TDSPB">1TDSPB</option>
+                <option value="1TDSPA">1TDSPA</option>
+                <option value="1TDSPC">1TDSPC</option>
+                <option value="1TDSPD">1TDSPD</option>
+              </select>
+              <span>
+                {errors.turma && (
+                  <small className="bg-red-400 text-red-600" role="alert">
+                    {errors.turma.message}
+                  </small>
+                )}
+              </span>
+            </div>
 
             <div>
               <label htmlFor="nota">NOTA</label>

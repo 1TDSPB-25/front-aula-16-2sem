@@ -11,8 +11,7 @@ export default function Alunos() {
     const callList = async ()=>{
       try {
         
-        const response = await fetch("https://projetoaluno-w9h9.onrender.com/aluno");
-        
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/aluno`);
         if(response.ok){
           const data:TipoAluno[] = await response.json();
           setAlunos(data);
