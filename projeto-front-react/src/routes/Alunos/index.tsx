@@ -10,7 +10,8 @@ export default function Alunos() {
 
     const callList = async ()=>{
       try {
-        const response = await fetch("http://localhost:3000/alunos");
+        
+        const response = await fetch("https://projetoaluno-w9h9.onrender.com/aluno");
         
         if(response.ok){
           const data:TipoAluno[] = await response.json();

@@ -1,6 +1,6 @@
 export type TipoAluno = {
-	id   : number;
-    rm   : number;
-	aluno: string;
+	rm   : number;
+    nome : string;
+	turma: string;
 	nota : number;
 }
