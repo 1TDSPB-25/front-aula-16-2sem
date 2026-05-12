@@ -36,9 +36,9 @@ export default function Alunos() {
           
           <thead>
             <tr>
-              <th>ID</th>
               <th>RM</th>
-              <th>ALUNO</th>
+              <th>NOME</th>
+              <th>TURMA</th>
               <th>NOTA</th>
               <th>EDITAR/EXCLUIR</th>
             </tr>
@@ -46,12 +46,12 @@ export default function Alunos() {
 
           <tbody>
             {alunos.map((a)=>(
-              <tr key={a.id}>
-                <td>{a.id}</td>
+              <tr key={a.rm}>
                 <td>{a.rm}</td>
-                <td>{a.aluno}</td>
+                <td>{a.nome}</td>
+                <td>{a.turma}</td>
                 <td>{a.nota}</td>
-                <td> <Link to={`/editar/aluno/${a.id}`}>Editar</Link> / <Link to={`/editar/aluno/${a.id}`}>Excluir</Link></td>
+                <td> <Link to={`/editar/aluno/${a.rm}`}>Editar</Link> / <Link to={`/editar/aluno/${a.rm}`}>Excluir</Link></td>
               </tr>
             ))}
           </tbody>
