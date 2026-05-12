@@ -1,17 +1,14 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect} from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import type { TipoAluno } from "../../types/tipoAluno";
 import { useForm } from "react-hook-form";
 
 export default function EditarAluno() {
-  const { id } = useParams<string>();
 
-  const [aluno, setAluno] = useState<TipoAluno>({
-    id: 0,
-    rm: 0,
-    aluno: "",
-    nota: 0,
-  });
+  const navigate = useNavigate()
+
+  const { rm } = useParams<string>();
+  console.log(rm);
 
   const {
     register,
@@ -23,14 +20,15 @@ export default function EditarAluno() {
   useEffect(() => {
     const callAluno = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/alunos/${id}`);
+        // const response = await fetch(`http://localhost:3000/alunos/${id}`);
+        const response = await fetch(`https://projetoaluno-69jw.onrender.com/aluno/${rm}`);
 
         if (response.ok) {
           const data: TipoAluno = await response.json();
 
-          setValue("id", data.id);
-          setValue("rm", data.rm, { shouldValidate: true });
-          setValue("aluno", data.aluno, { shouldValidate: true });
+          setValue("rm", data.rm);
+          setValue("nome", data.nome, { shouldValidate: true });
+          setValue("turma", data.turma, { shouldValidate: true });
           setValue("nota", data.nota, { shouldValidate: true });
         } else {
           throw new Error("Aluno inexistente");
@@ -41,15 +39,45 @@ export default function EditarAluno() {
     };
 
     callAluno();
-  }, [id,setValue]);
+  }, [rm,setValue]);
+
+
+const onSubmit = (aluno : TipoAluno)=>{
+
+  const updateAluno = async()=>{
+  try {
+
+      console.log(aluno);
+      const response = await fetch(`https://projetoaluno-69jw.onrender.com/aluno`,{
+        method:"PUT",
+        headers:{
+        "Content-Type":"application/json"
+      },
+        body: JSON.stringify(aluno)
+     });
+
+     if(!response.ok){
+        throw new Error("Ocorreu um erro na atualização!");
+     }
+        alert("Aluno atualizado com sucesso!");
+        navigate("/alunos");
+
+  } catch (error) {
+    console.error(error);
+  }
+ }
+
+ updateAluno();
+
+}
 
   return (
     <main>
       <h1>Editar Aluno</h1>
       <div>
-        <form className="formAluno">
+        <form className="formAluno" onSubmit={handleSubmit(onSubmit)}>
           <fieldset>
-            <legend>Aluno : {aluno?.id}</legend>
+            <legend>Aluno</legend>
             <div>
               <label htmlFor="rm">RM</label>
               <input
@@ -57,8 +85,8 @@ export default function EditarAluno() {
                 {...register("rm", {
                   valueAsNumber: true,
                   required: "O RM é obrigatório",
-                  minLength: { value: 6, message: "Mínimo de 6 dígitos" },
-                  maxLength: { value: 7, message: "Máximo de 7 dígitos" },
+                  min: { value: 0, message: "Mínimo de 0 dígitos" },
+                  max: { value: 99999, message: "Máximo de 999999 dígitos" },
                 })}
               />
               {errors.rm && (
@@ -66,15 +94,32 @@ export default function EditarAluno() {
               )}
             </div>
             <div>
-              <label htmlFor="aluno">ALUNO</label>
+              <label htmlFor="nome">ALUNO</label>
               <input
                 type="text"
-                {...register("aluno", {
+                {...register("nome", {
                   required: true,
                   minLength: { value: 3, message: "Mínimo de 3 caractéres" },
-                  maxLength: { value: 7, message: "Máximo de 150 caractéres" },
+                  maxLength: { value: 150, message: "Máximo de 150 caractéres" },
                 })}
               />
+              {errors.nome && (
+                <span className="text-red-400">{errors.nome.message}</span>
+              )}
+            </div>
+            <div>
+              <label htmlFor="turma">TURMA</label>
+              <input
+                type="text"
+                {...register("turma", {
+                  required: "Campo obrigatório!",
+                  minLength: { value: 5, message: "Número min de caracteres 5." },
+                  maxLength: { value: 6, message: "Número max de caracteres 6." },
+                })}
+              />
+              {errors.turma && (
+                <span className="text-red-400">{errors.turma.message}</span>
+              )}
             </div>
             <div>
               <label htmlFor="nota">NOTA</label>
@@ -88,6 +133,12 @@ export default function EditarAluno() {
                   max: { value: 10, message: "Valor máximo é 10" },
                 })}
               />
+              {errors.nota && (
+                <span className="text-red-400">{errors.nota.message}</span>
+              )}
+            </div>
+            <div>
+              <button type="submit">Atualizar</button>
             </div>
           </fieldset>
         </form>
